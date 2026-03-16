@@ -1,11 +1,11 @@
 import {createContext, useState, useContext, ReactNode} from 'react';
 import {useColorScheme} from 'react-native';
 import {lightColors,darkColors} from './colors';
-import { Fonts } from './fonts';
+import { FontStyles } from './fonts';
 
 type Global= {
   colors: typeof lightColors;
-  fonts: typeof Fonts;
+  fonts: typeof FontStyles;
 };
 
 type ThemeContextType = {
@@ -21,7 +21,7 @@ export const ThemeProvider = ({children}: {children:ReactNode}) => {
     const toggleTheme = () => setDark(!dark); 
     const theme:Global = {
         colors: (dark ? darkColors : lightColors),
-        fonts: Fonts,
+        fonts: FontStyles,
     };
     return (
         <ThemeContext.Provider value ={{theme, toggleTheme}}>

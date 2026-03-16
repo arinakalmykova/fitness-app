@@ -1,12 +1,11 @@
 import { StatusBar, StyleSheet} from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import AppNavigation from './src/navigation/AppNavigation';
-import { NavigationContainer} from '@react-navigation/native';
 import { ThemeProvider } from './src/theme/ThemeContext'
 import { useTheme } from './src/theme/ThemeContext';
 import AppLoading from 'expo-app-loading';
 import * as Font from 'expo-font';
 import {useState} from "react";
+import Layout from './src/screens/Layout';
 
 const loadFonts = () => {
   return Font.loadAsync({
@@ -44,9 +43,7 @@ function AppContent() {
       <StatusBar
         barStyle={theme.colors.background === 'white' ? 'dark-content' : 'light-content'}
       />
-      <NavigationContainer>
-        <AppNavigation />
-      </NavigationContainer>
+     <Layout/>
     </>
   );
 }

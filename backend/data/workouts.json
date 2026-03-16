@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1,
+    "type": "cardio",
+    "duration": 30,
+    "calories": 250,
+    "date": "2026-03-15",
+    "exercises": [
+      {
+        "name": "Бег",
+        "time": 20
+      },
+      {
+        "name": "Прыжки на скакалке",
+        "time": 10
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "type": "strength",
+    "duration": 45,
+    "calories": 320,
+    "date": "2026-03-14",
+    "exercises": [
+      {
+        "name": "Приседания",
+        "sets": 4,
+        "reps": 12
+      },
+      {
+        "name": "Жим гантелей",
+        "sets": 3,
+        "reps": 10
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "type": "yoga",
+    "duration": 40,
+    "calories": 150,
+    "date": "2026-03-13",
+    "exercises": [
+      {
+        "name": "Собака мордой вниз",
+        "time": 5
+      },
+      {
+        "name": "Планка",
+        "time": 3
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "type": "running",
+    "duration": 25,
+    "calories": 300,
+    "date": "2026-03-12",
+    "exercises": [
+      {
+        "name": "Берпи",
+        "sets": 4,
+        "reps": 12
+      },
+      {
+        "name": "Горные альпинисты",
+        "sets": 3,
+        "reps": 20
+      }
+    ]
+  }
+]
