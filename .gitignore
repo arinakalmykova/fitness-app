@@ -1,0 +1,24 @@
+# dependencies
+node_modules/
+
+# React Native
+android/build/
+android/app/build/
+android/.gradle/
+android/local.properties
+
+# APK
+*.apk
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+
+# env
+.env
+
+# mac
+.DS_Store
+
+# windows
+Thumbs.db
