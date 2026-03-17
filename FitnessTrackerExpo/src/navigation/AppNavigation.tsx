@@ -1,39 +1,18 @@
-import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Ionicons } from '@expo/vector-icons';
-import DashboardScreen from '../screens/DashboardScreen';
-import WorkoutScreen from '../screens/WorkoutScreen';
-import HistoryScreen from '../screens/HistoryScreen';
-import { useTheme } from './../theme/ThemeContext';
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import WorkoutDetailScreen from "./../screens/WorkoutDetailScreen";
+import BottomTabNavigator from "./BottomTabNavigator";
 
-const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
+
+function MainTabsStack() {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Tabs" component={BottomTabNavigator} />
+      <Stack.Screen name="WorkoutDetail" component={WorkoutDetailScreen} />
+    </Stack.Navigator>
+  );
+}
 
 export default function AppNavigation() {
-  const { theme } = useTheme();
-
-  return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        headerShown: false,
-        tabBarActiveTintColor: theme.colors.button,
-        tabBarInactiveTintColor: theme.colors.text,
-        tabBarStyle: {
-            backgroundColor: theme.colors.background,
-            paddingTop: 10,
-            paddingBottom: 15
-        },
-        tabBarIcon: ({ color, size }) => {
-          let iconName: keyof typeof Ionicons.glyphMap = "home";
-          if (route.name === 'Главная') iconName = 'home';
-          else if (route.name === 'Тренировки') iconName = 'barbell';
-          else if (route.name === 'История') iconName = 'time';
-          return <Ionicons name={iconName} size={size} color={color} />;
-        },
-      })}
-    >
-      <Tab.Screen name="Главная" component={DashboardScreen} />
-      <Tab.Screen name="Тренировки" component={WorkoutScreen} />
-      <Tab.Screen name="История" component={HistoryScreen} />
-    </Tab.Navigator>
-  );
+  return <MainTabsStack />;
 }

@@ -1,20 +1,21 @@
-import { StatusBar, StyleSheet} from 'react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { ThemeProvider } from './src/theme/ThemeContext'
-import { useTheme } from './src/theme/ThemeContext';
-import AppLoading from 'expo-app-loading';
-import * as Font from 'expo-font';
-import {useState} from "react";
-import Layout from './src/screens/Layout';
+import { StatusBar, StyleSheet } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { ThemeProvider } from "./src/theme/ThemeContext";
+import { useTheme } from "./src/theme/ThemeContext";
+import AppLoading from "expo-app-loading";
+import * as Font from "expo-font";
+import { useState } from "react";
+import Layout from "./src/screens/Layout";
+import { WorkoutProvider } from "./src/store/WorkoutContext";
 
 const loadFonts = () => {
   return Font.loadAsync({
-    'GoogleSans-Regular': require('./assets/fonts/GoogleSans-Regular.ttf'),
-    'GoogleSans-Bold': require('./assets/fonts/GoogleSans-Bold.ttf')
+    "GoogleSans-Regular": require("./assets/fonts/GoogleSans-Regular.ttf"),
+    "GoogleSans-Bold": require("./assets/fonts/GoogleSans-Bold.ttf"),
   });
 };
 
-export  function App() {
+export function App() {
   const [fontsLoaded, setFontsLoaded] = useState(false);
 
   if (!fontsLoaded) {
@@ -28,11 +29,13 @@ export  function App() {
   }
 
   return (
-    <ThemeProvider>
-      <SafeAreaProvider>
-        <AppContent />
-      </SafeAreaProvider>
-    </ThemeProvider>
+    <WorkoutProvider>
+      <ThemeProvider>
+        <SafeAreaProvider>
+          <AppContent />
+        </SafeAreaProvider>
+      </ThemeProvider>
+    </WorkoutProvider>
   );
 }
 
@@ -41,9 +44,11 @@ function AppContent() {
   return (
     <>
       <StatusBar
-        barStyle={theme.colors.background === 'white' ? 'dark-content' : 'light-content'}
+        barStyle={
+          theme.colors.background === "white" ? "dark-content" : "light-content"
+        }
       />
-     <Layout/>
+      <Layout />
     </>
   );
 }

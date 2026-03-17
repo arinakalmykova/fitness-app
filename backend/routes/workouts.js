@@ -21,9 +21,6 @@ router.get("/", (req, res) => {
   });
 });
 
-
-
-
 router.post('/', (req, res) => {
   const workout = req.body;
 
@@ -34,6 +31,18 @@ router.post('/', (req, res) => {
 
   fs.writeFileSync(FILE, JSON.stringify(workouts, null, 2));
   res.json({ message: "Workout saved" });
+});
+
+router.delete('/:id', (req, res) => {
+  const id = Number(req.params.id);
+
+  const data = fs.readFileSync(FILE, 'utf-8');
+  const workouts = JSON.parse(data);
+
+  const updatedWorkouts = workouts.filter(w => w.id !== id);
+
+  fs.writeFileSync(FILE, JSON.stringify(updatedWorkouts, null, 2));
+  res.json({ message: "Workout deleted" });
 });
 
 module.exports = router;

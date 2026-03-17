@@ -1,7 +1,20 @@
-import { useState } from "react";
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, ScrollView, FlatList } from "react-native";
+import { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  StyleSheet,
+  ScrollView,
+  FlatList,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../theme/ThemeContext";
+import { useWorkouts } from "../hooks/useWorkouts";
+import type { Exercise, Workout } from "../components/WorkoutCard";
+import ExerciseItem from "../components/ExerciseItem";
+import { Modal } from "react-native";
+import ThemeToogle from "../components/ThemeToogle";
 
 const workoutTypes = [
   { type: "strength", icon: "barbell", color: "#F06292" },
@@ -39,7 +52,6 @@ const styles = StyleSheet.create({
   },
   typeText: {
     fontWeight: "bold",
-    color: "#fff",
   },
   input: {
     borderWidth: 1,
@@ -49,38 +61,54 @@ const styles = StyleSheet.create({
   textButton: {
     textAlign: "center",
   },
-   button: {
-    boxShadow:'0px 0px 27px 0px rgba(174, 213, 96, 0.2) ',
+  button: {
+    boxShadow: "0px 0px 27px 0px rgba(174, 213, 96, 0.2) ",
     padding: 20,
-    borderRadius:20,
-    marginBottom:10,
-    marginTop:10
-    },
-
+    borderRadius: 20,
+    marginBottom: 10,
+    marginTop: 10,
+  },
 });
 
 export default function WorkoutScreen({ navigation }: any) {
   const { theme } = useTheme();
-
-  const [type, setType] = useState<string | null>(null);
+  const { createWorkout } = useWorkouts();
+  const [type, setType] = useState<Workout["type"] | null>(null);
   const [duration, setDuration] = useState("");
-  const [exercises, setExercises] = useState<string[]>([]);
+  const [exercises, setExercises] = useState<Exercise[]>([]);
   const [newExercise, setNewExercise] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalText, setModalText] = useState("");
 
   const addExercise = () => {
     if (newExercise.trim() !== "") {
-      setExercises([...exercises, newExercise]);
+      const exercise: Exercise = {
+        name: newExercise,
+        time: 5,
+      };
+      setExercises([...exercises, exercise]);
       setNewExercise("");
     }
   };
 
-  const startWorkout = () => {
+  useEffect(() => {
+    if (modalVisible) {
+      const timer = setTimeout(() => {
+        setModalVisible(false);
+      }, 1500); 
+
+      return () => clearTimeout(timer);
+    }
+  }, [modalVisible]);
+
+  const startWorkout = async () => {
     if (!type || !duration || exercises.length === 0) {
-      alert("Заполните все поля!");
+      setModalText("Заполните все поля!");
+      setModalVisible(true);
       return;
     }
 
-    const workout = {
+    const workout: Workout = {
       id: Date.now(),
       type,
       duration: Number(duration),
@@ -89,22 +117,36 @@ export default function WorkoutScreen({ navigation }: any) {
       exercises,
     };
 
-    console.log("Workout saved:", workout);
-    alert("Тренировка добавлена!");
-    navigation.goBack();
+    try {
+      await createWorkout(workout);
+
+      setModalText("Тренировка добавлена!");
+      setModalVisible(true);
+    } catch (err) {
+      console.error(err);
+      setModalText("Ошибка при сохранении");
+      setModalVisible(true);
+    }
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: theme.colors.background }]}>
+    <ScrollView
+      style={[styles.container, { backgroundColor: theme.colors.background }]}
+    >
       <View style={styles.header}>
-        <Text style={[{ color: theme.colors.textTitle }, theme.fonts.h1]}>Новая тренировка</Text>
+        <Text style={[{ color: theme.colors.textTitle }, theme.fonts.h1]}>
+          Новая тренировка
+        </Text>
         <Text style={[{ color: theme.colors.text }, theme.fonts.text]}>
           Выберите параметры и упражнения
         </Text>
+        <ThemeToogle />
       </View>
 
       <View style={styles.section}>
-        <Text style={[{ color: theme.colors.text }, theme.fonts.text]}>Тип тренировки:</Text>
+        <Text style={[{ color: theme.colors.text }, theme.fonts.text]}>
+          Тип тренировки:
+        </Text>
         <View style={styles.typeGrid}>
           {workoutTypes.map((w) => (
             <TouchableOpacity
@@ -112,22 +154,30 @@ export default function WorkoutScreen({ navigation }: any) {
               style={[
                 styles.typeCard,
                 {
-                  backgroundColor: type === w.type ? w.color : theme.colors.card,
+                  backgroundColor:
+                     type === w.type ? w.color :theme.colors.card,
+                  borderColor:
+                     type === w.type ? w.color :theme.colors.textTitle,
                 },
               ]}
-              onPress={() => setType(w.type)}
+              onPress={() => setType(w.type as Workout["type"])}
             >
-              <Ionicons name={w.icon as any} size={28} color="#fff" />
-              <Text style={styles.typeText}>{w.type.toUpperCase()}</Text>
+              <Ionicons name={w.icon as any} size={28} color={theme.colors.textTitle} />
+              <Text style={[styles.typeText, { color: theme.colors.textTitle }]}>{w.type.toUpperCase()}</Text>
             </TouchableOpacity>
           ))}
         </View>
       </View>
 
       <View style={styles.section}>
-        <Text style={[{ color: theme.colors.text }, theme.fonts.text]}>Длительность (мин):</Text>
+        <Text style={[{ color: theme.colors.text }, theme.fonts.text]}>
+          Длительность (мин):
+        </Text>
         <TextInput
-          style={[styles.input, { borderColor: theme.colors.text, color: theme.colors.text }]}
+          style={[
+            styles.input,
+            { borderColor: theme.colors.text, color: theme.colors.text },
+          ]}
           keyboardType="numeric"
           value={duration}
           onChangeText={setDuration}
@@ -137,29 +187,64 @@ export default function WorkoutScreen({ navigation }: any) {
       </View>
 
       <View style={styles.section}>
-        <Text style={[{ color: theme.colors.text }, theme.fonts.text]}>Упражнения:</Text>
+        <Text style={[{ color: theme.colors.text }, theme.fonts.text]}>
+          Упражнения:
+        </Text>
         {exercises.map((ex, index) => (
-          <Text key={index} style={[{ color: theme.colors.text }, theme.fonts.text]}>
-            • {ex}
-          </Text>
+          <ExerciseItem key={index} item={ex} />
         ))}
         <TextInput
-          style={[styles.input, { borderColor: theme.colors.text, color: theme.colors.text }]}
+          style={[
+            styles.input,
+            { borderColor: theme.colors.text, color: theme.colors.text },
+          ]}
           value={newExercise}
           onChangeText={setNewExercise}
           placeholder="Новое упражнение"
           placeholderTextColor="#888"
         />
-           <TouchableOpacity
-                    style={[styles.button,{backgroundColor:theme.colors.button}]} onPress={addExercise}>
-           <Text style={[styles.textButton, theme.fonts.button]}>Добавить упражнение</Text>
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: theme.colors.button }]}
+          onPress={addExercise}
+        >
+          <Text style={[styles.textButton, theme.fonts.button]}>
+            Добавить упражнение
+          </Text>
         </TouchableOpacity>
       </View>
 
-         <TouchableOpacity
-                  style={[styles.button,{backgroundColor:theme.colors.button}]} onPress={startWorkout}>
-         <Text style={[styles.textButton, theme.fonts.button]}>Начать тренировку</Text>
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: theme.colors.button }]}
+        onPress={startWorkout}
+      >
+        <Text style={[styles.textButton, theme.fonts.button]}>
+          Добавить тренировку
+        </Text>
       </TouchableOpacity>
+
+      <Modal transparent visible={modalVisible} animationType="fade">
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "flex-end",
+            alignItems: "center",
+            paddingBottom: 50,
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: theme.colors.card,
+              paddingVertical: 12,
+              paddingHorizontal: 20,
+              borderRadius: 20,
+              borderWidth: 1,
+              borderColor: "#222",
+            }}
+          >
+            <Text style={{ color: theme.colors.text }}>{modalText}</Text>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }

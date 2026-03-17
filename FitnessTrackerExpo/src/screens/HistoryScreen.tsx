@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
 import { View, Text, FlatList, StyleSheet } from "react-native";
 import { useTheme } from "../theme/ThemeContext";
 import WorkoutCard from "../components/WorkoutCard";
 import ThemeToogle from "../components/ThemeToogle";
-import type { Workout } from "../components/WorkoutCard";
+import { useWorkoutContext } from "../store/WorkoutContext";
+import AnimatedWorkoutItem from "../components/AnimatedWorkoutItem";
 
 const styles = StyleSheet.create({
   container: {
@@ -31,19 +31,9 @@ const styles = StyleSheet.create({
   }
 });
 
-export default function HistoryScreen() {
-
+export default function HistoryScreen({ navigation }:  any) {
   const { theme } = useTheme();
-  const [workouts, setWorkouts] = useState<Workout[]>([]);
-
-  useEffect(() => {
-    fetch("http://10.0.2.2:5000/workouts")
-      .then(res => res.json())
-      .then(data => {
-        setWorkouts(data.workouts || []);
-      })
-      .catch(err => console.log(err));
-  }, []);
+  const { workouts, deleteWorkout } = useWorkoutContext();
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
@@ -71,9 +61,16 @@ export default function HistoryScreen() {
           data={workouts}
           keyExtractor={(item) => item.id.toString()}
           style={styles.list}
-          renderItem={({ item }) => (
-            <WorkoutCard workout={item} />
-          )}
+          renderItem={({ item, index }) => (
+                        <AnimatedWorkoutItem
+                          item={item}
+                          index={index}
+                          onPress={(workout) =>
+                            navigation.navigate("WorkoutDetail", { workout })
+                          }
+                          onDelete={(id) => deleteWorkout(id)}
+                        />
+                      )}
         />
       )}
 

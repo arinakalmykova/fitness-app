@@ -3,6 +3,10 @@ import { View, Text, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../theme/ThemeContext";
 import { Pressable } from "react-native";
+export type Exercise ={
+    name: string;
+    time: number
+}
 
 export type Workout = {
   id: number;
@@ -10,13 +14,16 @@ export type Workout = {
   duration: number;
   calories: number;
   date: string;
+  exercises: Exercise[];
 };
 
 type Props = {
   workout: Workout;
+  onDelete: (id: number) => void;
+  onPress: (workout: Workout) => void; 
 };
 
-export default function WorkoutCard({ workout }: Props) {
+export default function WorkoutCard({ workout, onDelete, onPress }: Props) {
   const { theme } = useTheme();
   const typeIcons: Record<Workout["type"], keyof typeof Ionicons.glyphMap> = {
     strength: "barbell",
@@ -26,7 +33,8 @@ export default function WorkoutCard({ workout }: Props) {
   };
 
   return (
-        <Pressable
+       <Pressable
+            onPress={() => onPress && onPress(workout)}
             style={({ pressed }) => [
                 styles.card,
                 {
@@ -59,7 +67,14 @@ export default function WorkoutCard({ workout }: Props) {
                 </Text>
             </View>
         </View>  
+        <Pressable
+          onPress={(e) => { e.stopPropagation(); onDelete(workout.id); }}
+          hitSlop={10}
+          style={styles.delete}
+        >
+          <Ionicons name="trash" size={24} color={theme.colors.text} />
         </Pressable>
+    </Pressable>
   );
 }
 
@@ -70,10 +85,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
     borderColor: "#222222",
     borderWidth: 1,
-    display: "flex",
     flexDirection: "row",
-    gap: 40, 
-    alignItems:"center"
+    alignItems:"center",
+    gap:15,
+    justifyContent: "space-between"
   },
    content: {
     display: "flex",
@@ -95,5 +110,12 @@ const styles = StyleSheet.create({
   info: {
     flexDirection: "row",
     gap: 15,
+  },
+  delete: {
+    marginLeft: "auto",
+    padding: 8,
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
